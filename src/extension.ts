@@ -28,20 +28,27 @@ export function activate(context: vscode.ExtensionContext) {
       replay.start(context);
     }
   );
-
+  const exitMacro = vscode.commands.registerCommand(
+    "jevakallio.vscode-hacker-typer.exitMacro",
+    () => {
+      replay.stopMacro();
+    }
+  );
   let remove = vscode.commands.registerCommand(
     "jevakallio.vscode-hacker-typer.removeMacro",
     () => {
       const storage = Storage.getInstance(context);
       const items = storage.list();
-      vscode.window.showQuickPick(items.map(item => item.name)).then(picked => {
-        if (!picked) {
-          return;
-        }
+      vscode.window
+        .showQuickPick(items.map((item) => item.name))
+        .then((picked) => {
+          if (!picked) {
+            return;
+          }
 
-        storage.remove(picked);
-        vscode.window.showInformationMessage(`Removed "${picked}"`);
-      });
+          storage.remove(picked);
+          vscode.window.showInformationMessage(`Removed "${picked}"`);
+        });
     }
   );
 
@@ -55,7 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
     replay.onBackspace
   );
 
-  context.subscriptions.push(record, play, type, backspace, remove);
+  context.subscriptions.push(record, play, type, backspace, remove, exitMacro);
 }
 
 // this method is called when your extension is deactivated

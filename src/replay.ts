@@ -14,7 +14,7 @@ let currentBuffer: buffers.Buffer | undefined;
 export function start(context: vscode.ExtensionContext) {
   const storage = Storage.getInstance(context);
   const items = storage.list();
-  vscode.window.showQuickPick(items.map(item => item.name)).then(picked => {
+  vscode.window.showQuickPick(items.map((item) => item.name)).then((picked) => {
     if (!picked) {
       return;
     }
@@ -50,13 +50,13 @@ async function setStartingPoint(
     vscode.window.showInformationMessage("opening new window");
     const document = await vscode.workspace.openTextDocument({
       language: startingPoint.language,
-      content: startingPoint.content
+      content: startingPoint.content,
     });
 
     editor = await vscode.window.showTextDocument(document);
   } else {
     const existingEditor = editor;
-    await existingEditor.edit(edit => {
+    await existingEditor.edit((edit) => {
       // update initial file content
       const l = existingEditor.document.lineCount;
       const range = new vscode.Range(
@@ -94,13 +94,17 @@ export function disable() {
   isEnabled = false;
   currentBuffer = undefined;
 }
-
+export function stopMacro() {
+  isEnabled = false;
+  vscode.window.showInformationMessage(`Macro is stopped`);
+}
 export function onType({ text }: { text: string }) {
   if (isEnabled) {
     replayQueue.add(
       () =>
         new Promise((resolve, reject) => {
           try {
+            // @ts-ignore
             advanceBuffer(resolve, text);
           } catch (e) {
             console.log(e);
@@ -178,7 +182,7 @@ function advanceBuffer(done: () => void, userInput: string) {
 
   if (changes && changes.length > 0) {
     editor
-      .edit(edit => applyContentChanges(changes, edit))
+      .edit((edit) => applyContentChanges(changes, edit))
       .then(updateSelectionAndAdvanceToNextBuffer);
   } else {
     updateSelectionAndAdvanceToNextBuffer();
@@ -189,7 +193,7 @@ function applyContentChanges(
   changes: vscode.TextDocumentContentChangeEvent[],
   edit: vscode.TextEditorEdit
 ) {
-  changes.forEach(change => applyContentChange(change, edit));
+  changes.forEach((change) => applyContentChange(change, edit));
 }
 
 function applyContentChange(

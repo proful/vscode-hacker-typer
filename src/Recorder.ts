@@ -82,7 +82,7 @@ export default class Recorder {
       position: this._buffers++,
       content,
       language,
-      selections
+      selections,
     });
   }
 
@@ -90,9 +90,9 @@ export default class Recorder {
     vscode.window
       .showInputBox({
         prompt: "What do you want to call your stop point?",
-        placeHolder: "Type a name or ENTER for unnamed stop point"
+        placeHolder: "Type a name or ENTER for unnamed stop point",
       })
-      .then(name => {
+      .then((name) => {
         this.insertStop(name || null);
       });
   }
@@ -100,11 +100,13 @@ export default class Recorder {
   private insertStop(name: string | null) {
     buffers.insert({
       stop: {
-        name: name || null
+        name: name || null,
       },
+      // @ts-ignore
       changes: null,
+      // @ts-ignore
       selections: null,
-      position: this._buffers++
+      position: this._buffers++,
     });
   }
 
@@ -112,17 +114,17 @@ export default class Recorder {
     vscode.window
       .showInputBox({
         prompt: "Give this thing a name",
-        placeHolder: "cool-macro"
+        placeHolder: "cool-macro",
       })
-      .then(name => {
+      .then((name) => {
         if (name) {
           return this._storage
             .save({
               name,
               description: "",
-              buffers: buffers.all()
+              buffers: buffers.all(),
             })
-            .then(macro => {
+            .then((macro) => {
               vscode.window.showInformationMessage(
                 `Saved ${macro.buffers.length} buffers under "${macro.name}".`
               );
@@ -157,7 +159,7 @@ export default class Recorder {
     buffers.insert({
       changes,
       selections,
-      position: this._buffers++
+      position: this._buffers++,
     });
   }
 

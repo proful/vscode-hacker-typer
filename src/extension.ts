@@ -28,6 +28,12 @@ export function activate(context: vscode.ExtensionContext) {
       replay.start(context);
     }
   );
+  let playLine = vscode.commands.registerCommand(
+    "jevakallio.vscode-hacker-typer.playLineMacro",
+    () => {
+      replay.start(context);
+    }
+  );
   const exitMacro = vscode.commands.registerCommand(
     "jevakallio.vscode-hacker-typer.exitMacro",
     () => {
@@ -142,6 +148,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     record,
     play,
+    playLine,
     type,
     backspace,
     remove,

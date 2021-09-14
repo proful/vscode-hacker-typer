@@ -1,12 +1,12 @@
 import * as vscode from "vscode";
 import * as buffers from "./buffers";
 import Storage from "./storage";
-import * as Queue from "promise-queue";
+// import * as Queue from "promise-queue";
 
 const stopPointBreakChar = `\n`; // ENTER
-const replayConcurrency = 1;
-const replayQueueMaxSize = Number.MAX_SAFE_INTEGER;
-const replayQueue = new Queue(replayConcurrency, replayQueueMaxSize);
+// const replayConcurrency = 1;
+// const replayQueueMaxSize = Number.MAX_SAFE_INTEGER;
+// const replayQueue = new Queue(replayConcurrency, replayQueueMaxSize);
 
 let isEnabled = false;
 let currentBuffer: buffers.Buffer | undefined;
@@ -98,20 +98,47 @@ export function stopMacro() {
   isEnabled = false;
   vscode.window.showInformationMessage(`Macro is stopped`);
 }
+function getText() {
+  // @ts-ignore
+  const text =
+    // @ts-ignore
+    currentBuffer?.changes && currentBuffer?.changes.length
+      ? // @ts-ignore
+        currentBuffer.changes[0].text
+      : "";
+  return text;
+}
+
+function advance(text: string) {
+  console.log("before advanced: " + getText());
+  advanceBuffer(() => {
+    console.log("after advanced: " + getText());
+    if (!getText().includes("\n")) {
+      setTimeout(() => {
+        return advance(text);
+      }, 300);
+    }
+  }, text);
+}
+
 export function onType({ text }: { text: string }) {
   if (isEnabled) {
-    replayQueue.add(
-      () =>
-        new Promise((resolve, reject) => {
-          try {
-            // @ts-ignore
-            advanceBuffer(resolve, text);
-          } catch (e) {
-            console.log(e);
-            reject(e);
-          }
-        })
-    );
+    advance(text);
+    // replayQueue.add(
+    //   () =>
+    //     new Promise((resolve, reject) => {
+    //       try {
+    //         // @ts-ignore
+    //         advanceBuffer((val) => {
+    //           console.log("advanced", val);
+    //           resolve(val);
+    //         }, text);
+    //       } catch (e) {
+    //         console.log(e);
+    //         reject(e);
+    //       }
+    //     })
+    // );
   } else {
     vscode.commands.executeCommand("default:type", { text });
   }

@@ -1,8 +1,8 @@
 {
   "name": "vscode-hacker-typer",
-  "displayName": "VSCode HackerTyper",
+  "displayName": "VSCode HackerTyper Improved",
   "description": "Hacker Typer extension for looking cool while live coding",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "jevakallio",
   "author": {
     "name": "Jani Eväkallio"
@@ -48,6 +48,10 @@
         "key": "cmd+shift+t p"
       },
       {
+        "command": "jevakallio.vscode-hacker-typer.playLineMacro",
+        "key": "cmd+shift+t l"
+      },
+      {
         "command": "jevakallio.vscode-hacker-typer.saveMacro",
         "key": "cmd+shift+t s"
       },
@@ -73,6 +77,11 @@
       {
         "command": "jevakallio.vscode-hacker-typer.playMacro",
         "title": "Play Macro",
+        "category": "HackerTyper"
+      },
+      {
+        "command": "jevakallio.vscode-hacker-typer.playLineMacro",
+        "title": "Play Line Macro",
         "category": "HackerTyper"
       },
       {

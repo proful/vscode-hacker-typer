@@ -4,12 +4,18 @@ import Storage from "./storage";
 // import * as Queue from "promise-queue";
 
 const stopPointBreakChar = `\n`; // ENTER
+const pauseChar = "`"; // space
+let isRunning = false;
 // const replayConcurrency = 1;
 // const replayQueueMaxSize = Number.MAX_SAFE_INTEGER;
 // const replayQueue = new Queue(replayConcurrency, replayQueueMaxSize);
 
 let isEnabled = false;
 let currentBuffer: buffers.Buffer | undefined;
+
+const delay = vscode.workspace
+  .getConfiguration()
+  .get("jevakallio.vscode-hacker-typer.delay") as number;
 
 export function start(context: vscode.ExtensionContext) {
   const storage = Storage.getInstance(context);
@@ -110,20 +116,28 @@ function getText() {
 }
 
 function advance(text: string) {
-  console.log("before advanced: " + getText());
-  advanceBuffer(() => {
-    console.log("after advanced: " + getText());
-    if (!getText().includes("\n")) {
-      setTimeout(() => {
-        return advance(text);
-      }, 300);
-    }
-  }, text);
+  if (isRunning) {
+    advanceBuffer(() => {
+      if (!getText().includes("\n") && isRunning) {
+        setTimeout(() => {
+          return advance(text);
+        }, delay);
+      }
+      if (getText().includes("\n")) {
+        isRunning = false;
+      }
+    }, text);
+  }
 }
 
 export function onType({ text }: { text: string }) {
   if (isEnabled) {
-    advance(text);
+    if (text === pauseChar) {
+      isRunning = !isRunning;
+      advance(text);
+    } else {
+      vscode.commands.executeCommand("default:type", { text });
+    }
     // replayQueue.add(
     //   () =>
     //     new Promise((resolve, reject) => {
@@ -179,6 +193,7 @@ function advanceBuffer(done: () => void, userInput: string) {
 
   if (!buffer) {
     vscode.window.showErrorMessage("No buffer to advance");
+    stopMacro();
     return;
   }
 
@@ -231,6 +246,14 @@ function applyContentChange(
     edit.delete(change.range);
   } else if (change.rangeLength === 0) {
     edit.insert(change.range.start, change.text);
+    // if (change.text.length === 1) {
+    //   edit.insert(change.range.start, change.text);
+    // } else if (change.text.length > 1) {
+    //   change.text.split("").forEach((t) => {
+    //     edit.insert(change.range.start, t);
+    //     syncWait(200);
+    //   });
+    // }
   } else {
     edit.replace(change.range, change.text);
   }

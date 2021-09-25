@@ -28,6 +28,36 @@ export function activate(context: vscode.ExtensionContext) {
       replay.start(context);
     }
   );
+  let playA = vscode.commands.registerCommand(
+    "jevakallio.vscode-hacker-typer.playMacroA",
+    () => {
+      replay.startDirect(context, "A");
+    }
+  );
+  let playB = vscode.commands.registerCommand(
+    "jevakallio.vscode-hacker-typer.playMacroB",
+    () => {
+      replay.startDirect(context, "B");
+    }
+  );
+  let playC = vscode.commands.registerCommand(
+    "jevakallio.vscode-hacker-typer.playMacroC",
+    () => {
+      replay.startDirect(context, "C");
+    }
+  );
+  let playD = vscode.commands.registerCommand(
+    "jevakallio.vscode-hacker-typer.playMacroD",
+    () => {
+      replay.startDirect(context, "D");
+    }
+  );
+  let playE = vscode.commands.registerCommand(
+    "jevakallio.vscode-hacker-typer.playMacroE",
+    () => {
+      replay.startDirect(context, "E");
+    }
+  );
   const exitMacro = vscode.commands.registerCommand(
     "jevakallio.vscode-hacker-typer.exitMacro",
     () => {
@@ -142,6 +172,11 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     record,
     play,
+    playA,
+    playB,
+    playC,
+    playD,
+    playE,
     type,
     backspace,
     remove,

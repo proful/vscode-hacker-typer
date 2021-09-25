@@ -3,8 +3,9 @@ import * as buffers from "./buffers";
 import Storage from "./storage";
 // import * as Queue from "promise-queue";
 
-const stopPointBreakChar = `\n`; // ENTER
-const pauseChar = "`"; // space
+// const stopPointBreakChar = `\n`; // ENTER
+const stopPointBreakChar = "~"; // tick
+const pauseChar = "`"; // tick
 let isRunning = false;
 // const replayConcurrency = 1;
 // const replayQueueMaxSize = Number.MAX_SAFE_INTEGER;
@@ -40,10 +41,34 @@ export function start(context: vscode.ExtensionContext) {
     }
 
     isEnabled = true;
-    vscode.window.showInformationMessage(
-      `Now playing ${buffers.count()} buffers from ${macro.name}!`
-    );
+    // vscode.window.showInformationMessage(
+    //   `Now playing ${buffers.count()} buffers from ${macro.name}!`
+    // );
   });
+}
+
+export function startDirect(context: vscode.ExtensionContext, macroPrefix: string) {
+  const storage = Storage.getInstance(context);
+  const picked = vscode.workspace
+    .getConfiguration()
+    .get(`jevakallio.vscode-hacker-typer.macro${macroPrefix}`) as string;
+
+  const macro = storage.getByName(picked);
+  buffers.inject(macro.buffers);
+
+  currentBuffer = buffers.get(0);
+  if (!currentBuffer) {
+    vscode.window.showErrorMessage("No active recording");
+    return;
+  }
+
+  const textEditor = vscode.window.activeTextEditor;
+  if (buffers.isStartingPoint(currentBuffer)) {
+    setStartingPoint(currentBuffer, textEditor);
+  }
+
+  isEnabled = true;
+
 }
 
 async function setStartingPoint(
@@ -102,7 +127,8 @@ export function disable() {
 }
 export function stopMacro() {
   isEnabled = false;
-  vscode.window.showInformationMessage(`Macro is stopped`);
+  currentBuffer = undefined;
+  vscode.window.showInformationMessage(`It's time to Smile! 🥸`);
 }
 function getText() {
   // @ts-ignore
@@ -132,7 +158,7 @@ function advance(text: string) {
 
 export function onType({ text }: { text: string }) {
   if (isEnabled) {
-    if (text === pauseChar) {
+    if (text === pauseChar || text === stopPointBreakChar) {
       isRunning = !isRunning;
       advance(text);
     } else {
@@ -192,7 +218,7 @@ function advanceBuffer(done: () => void, userInput: string) {
   }
 
   if (!buffer) {
-    vscode.window.showErrorMessage("No buffer to advance");
+    // vscode.window.showErrorMessage("No buffer to advance");
     stopMacro();
     return;
   }

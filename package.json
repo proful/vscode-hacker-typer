@@ -1,8 +1,8 @@
 {
   "name": "vscode-hacker-typer",
-  "displayName": "VSCode HackerTyper Improved",
-  "description": "Hacker Typer extension for looking cool while live coding",
-  "version": "0.1.4",
+  "displayName": "Code Automatic Typer",
+  "description": "Code Automatic Typer",
+  "version": "0.1.6",
   "publisher": "jevakallio",
   "author": {
     "name": "Jani Eväkallio"

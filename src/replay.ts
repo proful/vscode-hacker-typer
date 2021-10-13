@@ -4,10 +4,11 @@ import Storage from "./storage";
 // import * as Queue from "promise-queue";
 
 // const stopPointBreakChar = `\n`; // ENTER
-const stopPointBreakChar = "~"; // tick
+// const stopPointBreakChar = "~"; // tick
 const pauseChar = "`"; // tick
-let isRunning = false;
 // const replayConcurrency = 1;
+let isRunning = false;
+let isStoppedBreakpoint = false;
 // const replayQueueMaxSize = Number.MAX_SAFE_INTEGER;
 // const replayQueue = new Queue(replayConcurrency, replayQueueMaxSize);
 
@@ -158,7 +159,7 @@ function advance(text: string) {
 
 export function onType({ text }: { text: string }) {
   if (isEnabled) {
-    if (text === pauseChar || text === stopPointBreakChar) {
+    if (text === pauseChar) {
       isRunning = !isRunning;
       advance(text);
     } else {
@@ -224,8 +225,12 @@ function advanceBuffer(done: () => void, userInput: string) {
   }
 
   if (buffers.isStopPoint(buffer)) {
-    if (userInput === stopPointBreakChar) {
+    if (userInput === pauseChar && isStoppedBreakpoint) {
       currentBuffer = buffers.get(buffer.position + 1);
+      isStoppedBreakpoint = false;
+    } else {
+      isRunning = false;
+      isStoppedBreakpoint = true;
     }
 
     return done();

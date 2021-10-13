@@ -94,6 +94,7 @@ export function activate(context: vscode.ExtensionContext) {
           }
 
           const options: vscode.SaveDialogOptions = {
+            defaultUri: vscode.Uri.file(picked),
             saveLabel: "Export",
             filters: {
               JSON: ["json"],
